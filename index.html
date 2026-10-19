@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MyCash</title>
+  <meta name="description" content="Nota spese da foto. I dati restano nel tuo Google Drive.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#1C2033">
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="MyCash">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <script src="config.js"></script>
+  <style>
+    :root { --bg:#1C2033; --verde:#199E7A; --lime:#DEFF9A; --fg:#FFFFFF; --muted:rgba(255,255,255,.66); }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { height:100%; background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; }
+    #app { position:fixed; inset:0; width:100%; height:100%; border:0; background:#F2F5F9; opacity:0; transition:opacity .35s; }
+    #app.pronta { opacity:1; }
+    #splash { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+              padding:24px 16px calc(24px + env(safe-area-inset-bottom)); text-align:center; transition:opacity .35s; z-index:2; }
+    #splash.via { opacity:0; pointer-events:none; }
+    #splash img { width:96px; height:96px; border-radius:24px; box-shadow:0 18px 40px -16px rgba(25,158,122,.8); }
+    .nome { font-size:30px; font-weight:700; letter-spacing:1px; }
+    .nome b { color:var(--lime); }
+    .sotto { color:var(--muted); font-size:14px; max-width:300px; line-height:1.45; }
+    .spin { width:22px; height:22px; border:3px solid rgba(255,255,255,.2); border-top-color:var(--verde); border-radius:50%; animation:g .8s linear infinite; }
+    @keyframes g { to { transform:rotate(360deg); } }
+    .aiuto { display:none; flex-direction:column; gap:10px; align-items:center; }
+    .aiuto.on { display:flex; }
+    .btn { display:inline-block; background:var(--verde); color:#fff; text-decoration:none; font-weight:600; font-size:15px; padding:13px 22px; border-radius:14px; border:0; cursor:pointer; }
+    .link { color:var(--muted); font-size:13px; text-decoration:underline; }
+    .piede { position:absolute; bottom:calc(18px + env(safe-area-inset-bottom)); left:0; right:0; font-size:12px; color:var(--muted); }
+    .piede a { color:var(--muted); }
+    .conf { background:rgba(255,255,255,.08); border-radius:14px; padding:14px; font-size:13px; line-height:1.5; max-width:340px; text-align:left; }
+    code { background:rgba(255,255,255,.12); padding:1px 5px; border-radius:6px; }
+  </style>
+</head>
+<body>
+  <div id="splash">
+    <img src="icons/icon-192.png" alt="">
+    <div class="nome"><b>M</b>y<b>C</b>ash</div>
+    <div class="sotto" id="stato">Apertura…</div>
+    <div class="spin" id="spin"></div>
+    <div class="aiuto" id="aiuto">
+      <div class="sotto">Non si apre? Succede se l'account Google non è ancora collegato in questa app.</div>
+      <a class="btn" id="diretto" href="#">Apri MyCash</a>
+    </div>
+    <div class="piede">🔒 I tuoi dati restano nel tuo Google Drive · <a href="privacy.html">Privacy</a></div>
+  </div>
+  <iframe id="app" title="MyCash" allow="camera; clipboard-write"></iframe>
+
+  <script>
+    (function () {
+      var url = (window.MYCASH_URL || "").trim();
+      var $ = function (id) { return document.getElementById(id); };
+      var parametri = new URLSearchParams(location.search);
+      var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+      if (!url) {
+        $("spin").style.display = "none";
+        $("stato").innerHTML = '<div class="conf">⚙️ <b>Da configurare</b><br>Apri <code>config.js</code> e incolla in <code>MYCASH_URL</code> l\'URL della web app Apps Script (finisce con <code>/exec</code>).</div>';
+        return;
+      }
+      $("diretto").href = url;
+
+      // iPhone/iPad: Safari blocca i cookie di Google dentro un riquadro, quindi si apre direttamente.
+      // Anche ?diretto forza questa modalità.
+      if (iOS || parametri.has("diretto")) {
+        $("stato").textContent = "Apertura…";
+        setTimeout(function () { location.replace(url); }, 350);
+        return;
+      }
+
+      // Android e computer: l'app si apre dentro il guscio, a tutto schermo
+      var frame = $("app");
+      frame.addEventListener("load", function () {
+        frame.classList.add("pronta");
+        setTimeout(function () { $("splash").classList.add("via"); }, 250);
+      });
+      frame.src = url;
+      setTimeout(function () {
+        if (!frame.classList.contains("pronta")) { $("spin").style.display = "none"; $("aiuto").classList.add("on"); }
+      }, 9000);
+    })();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+    }
+  </script>
+</body>
+</html>

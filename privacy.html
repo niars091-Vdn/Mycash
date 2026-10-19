@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Privacy · MyCash</title>
+  <link rel="icon" type="image/png" href="icons/favicon.png">
+  <meta name="theme-color" content="#199E7A">
+  <style>
+    :root { --bg:#F2F5F9; --card:#FFFFFF; --fg:#18202F; --muted:#6B7689; --line:#E3E8F0; --accent:#199E7A; --soft:rgba(25,158,122,.12); --warn:rgba(245,158,11,.14); }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) { --bg:#0E131A; --card:#161D27; --fg:#EDF1F6; --muted:#93A0B4; --line:#263142; --soft:rgba(25,158,122,.22); --warn:rgba(245,165,36,.16); }
+    }
+    :root[data-theme="dark"] { --bg:#0E131A; --card:#161D27; --fg:#EDF1F6; --muted:#93A0B4; --line:#263142; --soft:rgba(25,158,122,.22); --warn:rgba(245,165,36,.16); }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; font-size:15px; line-height:1.6; }
+    main { max-width:680px; margin:0 auto; padding:24px 16px calc(40px + env(safe-area-inset-bottom)); }
+    header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+    header img { width:44px; height:44px; border-radius:12px; }
+    h1 { font-size:24px; margin:0; } h2 { font-size:17px; margin:26px 0 6px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:16px 18px; }
+    .box { background:var(--soft); border-radius:14px; padding:14px 16px; }
+    .box.warn { background:var(--warn); margin-top:10px; }
+    ul { padding-left:20px; margin:6px 0; } li { margin:4px 0; }
+    .muted { color:var(--muted); font-size:13px; }
+    a { color:var(--accent); font-weight:600; }
+  </style>
+</head>
+<body>
+<main>
+  <header><img src="icons/icon-192.png" alt=""><div><h1>Privacy e sicurezza</h1><div class="muted">MyCash · nota spese da foto</div></div></header>
+
+  <div class="box"><b>In breve.</b> MyCash non ha un proprio server né un database. Funziona dentro Google con l'account di chi la usa: foto degli scontrini, registro spese e note restano nel Google Drive del dipendente. Chi gestisce l'app non riceve e non può aprire gli scontrini.</div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 style="margin-top:0">📁 Cosa resta nel Google Drive del dipendente</h2>
+    <ul>
+      <li>Nella cartella scelta dal dipendente: foto degli scontrini, il foglio "MyCash — Registro spese", le note provvisorie e i PDF firmati.</li>
+      <li>Sono file suoi: li vede, li modifica e li cancella quando vuole. Nessun altro li vede, a meno che non condivida la cartella.</li>
+    </ul>
+
+    <h2>👤 Profilo</h2>
+    <ul>
+      <li>Nome, cognome, sede, email del destinatario, link alla cartella e PIN sono salvati nello spazio riservato al suo account dentro l'app (Proprietà utente di Google Apps Script). Non li vedono gli altri utenti né il gestore.</li>
+      <li>Il PIN è salvato solo in forma cifrata (hash).</li>
+      <li>L'amministratore vede solo un elenco con nome, sede ed email di chi usa l'app.</li>
+    </ul>
+
+    <h2>📤 Cosa esce dal Drive, e quando</h2>
+    <ul>
+      <li>Solo quando il dipendente preme <b>Firma e invia</b>: parte un'email al responsabile indicato, con il PDF della nota, il totale e il link alla cartella (che si apre solo se il dipendente gli ha dato accesso).</li>
+      <li>Se l'azienda lo ha attivato, nel riepilogo aziendale viene aggiunta una riga con nome, mese, totale, link al PDF e stato della nota.</li>
+      <li>Le spese salvate ma non inviate non escono mai dal Drive.</li>
+    </ul>
+
+    <h2>🧾 Lettura degli scontrini</h2>
+    <ul>
+      <li><b>Google Gemini</b> (se attivato dall'azienda): la foto viene inviata a Google per leggere esercente, importi e voci.</li>
+      <li><b>OCR di Google Drive</b>: la foto viene trasformata in testo nel Drive del dipendente e il file temporaneo viene cancellato subito.</li>
+    </ul>
+    <div class="box warn">Con il piano gratuito di Gemini, secondo i termini di Google, i contenuti inviati possono essere usati per migliorare i servizi e visionati da revisori; con un piano a pagamento non vengono usati per addestrare i modelli. L'informativa dentro l'app indica quale piano usa la tua azienda.</div>
+
+    <h2>🔐 Sicurezza</h2>
+    <ul>
+      <li>Accesso solo con l'account Google del dipendente; connessione sempre cifrata (HTTPS).</li>
+      <li>Il PIN protegge l'app sul telefono, ma non sostituisce la password e la verifica in due passaggi dell'account Google.</li>
+      <li>Niente pubblicità, statistiche o tracciamento. Questo sito non usa cookie; sul telefono restano solo icona, tema scelto e ultima scelta "dove eri".</li>
+      <li>Servizi usati: Google Drive, Gmail, Google Apps Script e, se attivato, Google Gemini. Il sito di installazione è ospitato su Vercel e contiene solo questa pagina, l'icona e la schermata di avvio.</li>
+    </ul>
+
+    <h2>🗑 Cancellare i dati</h2>
+    <ul>
+      <li>Nell'app, <b>Profilo → Elimina il mio profilo</b> cancella profilo e PIN e toglie il nome dall'elenco.</li>
+      <li>I file nel Drive si cancellano eliminando la cartella o i singoli file.</li>
+      <li>Le note già inviate restano al destinatario (e nel riepilogo aziendale, se attivo), perché servono per il rimborso.</li>
+    </ul>
+
+    <h2>📮 Titolare del trattamento</h2>
+    <p style="margin:6px 0">È l'azienda che mette MyCash a disposizione dei dipendenti. Nome e contatto sono indicati nell'informativa dentro l'app (<b>Profilo → Privacy e sicurezza</b>).</p>
+  </div>
+
+  <p class="muted" style="margin-top:18px">Informativa v1 · aggiornata il 19/10/2026 · <a href="./">Apri MyCash</a></p>
+</main>
+</body>
+</html>
